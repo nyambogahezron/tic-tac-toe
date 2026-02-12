@@ -1,12 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { useGame } from '../context/GameProvider';
+import { useGame } from '@/context/GameProvider'
 import { useTheme } from '@/context/ThemeProvider';
+import { useAudio } from '@/context/AudioProvider'
 
 export default function DetailedLevelSelector() {
-	const { state, dispatch } = useGame();
-	const { colors } = useTheme();
+	const { state, dispatch } = useGame()
+	const { colors } = useTheme()
+	const { playSound, triggerHaptic } = useAudio()
 
 	const levels = [
 		{
@@ -29,11 +31,14 @@ export default function DetailedLevelSelector() {
 				'Place 3 pieces, then move only in straight lines (no diagonal)',
 			disabled: false,
 		},
-	];
+	]
 
 	const handleLevelChange = (levelId: number) => {
-		dispatch({ type: 'SET_GAME_LEVEL', level: levelId });
-	};
+		if (state.gameLevel === levelId) return
+		playSound('move')
+		triggerHaptic('medium')
+		dispatch({ type: 'SET_GAME_LEVEL', level: levelId })
+	}
 
 	return (
 		<Animated.View
@@ -112,7 +117,7 @@ export default function DetailedLevelSelector() {
 				))}
 			</View>
 		</Animated.View>
-	);
+	)
 }
 
 const styles = StyleSheet.create({

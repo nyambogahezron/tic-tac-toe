@@ -40,7 +40,7 @@ export default function RootLayout() {
 		console.error('Migration error:', error);
 	}
 
-	useDrizzleStudio(db.$client);
+	useDrizzleStudio(db.$client as any)
 
 	React.useEffect(() => {
 		if (Platform.OS === 'android') {
@@ -85,35 +85,27 @@ export default function RootLayout() {
 		return null;
 	}
 
-	if (!hasSeenWelcome) {
-		return (
+	return (
+		<ThemeProvider>
 			<SafeAreaProvider>
 				<View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-					<ThemeProvider>
+					{!hasSeenWelcome ? (
 						<WelcomeScreen onContinue={handleWelcomeContinue} />
-					</ThemeProvider>
+					) : (
+						<GameProvider>
+							<AchievementsProvider>
+								<AudioProvider>
+									<Stack screenOptions={{ headerShown: false }}>
+										<Stack.Screen name='(home)' />
+										<Stack.Screen name='+not-found' />
+									</Stack>
+									<AchievementPopup />
+								</AudioProvider>
+							</AchievementsProvider>
+						</GameProvider>
+					)}
 				</View>
 			</SafeAreaProvider>
-		);
-	}
-
-	return (
-		<SafeAreaProvider>
-			<View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-				<ThemeProvider>
-					<GameProvider>
-						<AchievementsProvider>
-							<AudioProvider>
-								<Stack screenOptions={{ headerShown: false }}>
-									<Stack.Screen name='(home)' />
-									<Stack.Screen name='+not-found' />
-								</Stack>
-								<AchievementPopup />
-							</AudioProvider>
-						</AchievementsProvider>
-					</GameProvider>
-				</ThemeProvider>
-			</View>
-		</SafeAreaProvider>
-	);
+		</ThemeProvider>
+	)
 }
