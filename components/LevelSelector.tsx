@@ -3,10 +3,12 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useGame } from '../context/GameProvider';
 import { useTheme } from '@/context/ThemeProvider';
+import { useAudio } from '@/context/AudioProvider'
 
 export default function LevelSelector() {
 	const { state, dispatch } = useGame();
 	const { colors } = useTheme();
+	const { playSound, triggerHaptic } = useAudio()
 
 	const levels = [
 		{ id: 1, name: 'L1', disabled: false },
@@ -17,6 +19,9 @@ export default function LevelSelector() {
 	];
 
 	const handleLevelChange = (levelId: number) => {
+		if (state.gameLevel === levelId) return
+		playSound('move')
+		triggerHaptic('light')
 		dispatch({ type: 'SET_GAME_LEVEL', level: levelId });
 	};
 

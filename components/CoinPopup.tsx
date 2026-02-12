@@ -11,40 +11,48 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Coins } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeProvider';
+import { useAudio } from '@/context/AudioProvider'
 
 interface CoinPopupProps {
-	amount: number;
-	onComplete: () => void;
+	amount: number
+	onComplete: () => void
 }
 
 export default function CoinPopup({ amount, onComplete }: CoinPopupProps) {
-	const { colors } = useTheme();
-	const scale = useSharedValue(0.8);
-	const translateY = useSharedValue(0);
-	const opacity = useSharedValue(1);
+	const { colors } = useTheme()
+	const { playSound, triggerHaptic } = useAudio()
+	const scale = useSharedValue(0.8)
+	const translateY = useSharedValue(0)
+	const opacity = useSharedValue(1)
 
 	useEffect(() => {
+		playSound('win')
+		triggerHaptic('success')
 		// Animate in
-		scale.value = withSpring(1, { damping: 15 });
-		translateY.value = withSpring(-20, { damping: 15 });
+		scale.value = withSpring(1, { damping: 15 })
+		translateY.value = withSpring(-20, { damping: 15 })
 
 		// Animate out after delay
 		const timer = setTimeout(() => {
-			opacity.value = withTiming(0, { duration: 300 });
-			translateY.value = withTiming(20, { duration: 300 }, (finished) => {
-				if (finished) {
-					runOnJS(onComplete)();
+			opacity.value = withTiming(0, { duration: 300 })
+			translateY.value = withTiming(
+				20,
+				{ duration: 300 },
+				(finished?: boolean) => {
+					if (finished) {
+						runOnJS(onComplete)()
+					}
 				}
-			});
-		}, 3000);
+			)
+		}, 3000)
 
-		return () => clearTimeout(timer);
-	}, [onComplete, scale, translateY, opacity]);
+		return () => clearTimeout(timer)
+	}, [onComplete, scale, translateY, opacity])
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ scale: scale.value }, { translateY: translateY.value }],
 		opacity: opacity.value,
-	}));
+	}))
 
 	return (
 		<Animated.View
@@ -66,7 +74,7 @@ export default function CoinPopup({ amount, onComplete }: CoinPopupProps) {
 				</BlurView>
 			</View>
 		</Animated.View>
-	);
+	)
 }
 
 const styles = StyleSheet.create({

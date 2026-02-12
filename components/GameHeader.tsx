@@ -18,11 +18,13 @@ import Animated, {
 import { useGame } from '../context/GameProvider';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeProvider';
+import { useAudio } from '@/context/AudioProvider'
 
 export default function GameHeader() {
 	const { state, dispatch } = useGame();
 	const router = useRouter();
 	const { colors } = useTheme();
+	const { playSound, triggerHaptic } = useAudio()
 	const scale = useSharedValue(1);
 
 	const resetButtonStyle = useAnimatedStyle(() => ({
@@ -30,6 +32,8 @@ export default function GameHeader() {
 	}));
 
 	const handleReset = () => {
+		playSound('reset')
+		triggerHaptic('medium')
 		scale.value = withSpring(0.9, { duration: 100 }, () => {
 			scale.value = withSpring(1);
 		});
